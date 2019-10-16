@@ -225,7 +225,7 @@ elif (decision == "image"):
                 #crops image on original frame
                 croppedAxle = frameCrop[center[1]-radius:center[1]+radius, center[0]-radius:center[0]+radius]  
                 cv2.imshow('crop', croppedAxle)
-                
+
                 fname = f[f.rfind("\\")+1:-4]
                 cv2.imwrite(img_circles+fname+"_axle_"+str(axleCount)+".jpg",croppedAxle)
                 axleCount += 1
@@ -236,7 +236,7 @@ elif (decision == "image"):
 
                 fname = f[f.rfind("\\")+1:]
 
-                with open(img_done+"cut.dat","a") as log:
+                with open(img_done+"_cut.dat","a") as log:
                     log.write(str(fname)+" "+str(axleCount)+"\n")
 
                 os.rename(f,img_done+fname)
