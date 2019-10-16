@@ -1,30 +1,23 @@
 """Cut Circles script.
 
-Cuts circles on frames based on three different mouse clicks. Images already processed are moved to another folder. All file paths must be edited on code, for now.
+Cuts circles on frames based on three different mouse clicks. Images already processed are moved to another folder.
 
 Usage:
-    python cutCircles.py <image/video>
+    python cutCircles.py <image/video> <source_folder>
 
-Note that, for now, the image path must be changed on the code. A future version will be implemented, with args.
 """
 import cv2
 import numpy as np
 import sys
+import errno
 import os
 import glob as gl
 
-if len(sys.argv) <= 1:
-    print("Axlecutter script.\n")
-    print("Cuts circles on frames based on three different mouse clicks. Images already processed are moved to another folder. All file paths must be edited on code, for now.\n")
-    print("Usage:\n")
-    print("python cutCircles.py <image/video>\n\n")
-    exit(1)
-
 # Paths
 # video_src = "D:\\Videos\\Truck\\Lateral\\Balanca\\20160927100754-550.MP4"
-img_src = "D:\\Data\\Images\\Truck"
-img_dest = "D:\\Data\\Images\\Murilo1\\"
-out = "D:\\Data\\Images\\Murilo2\\"
+
+# Source folder with images to cut
+img_src = sys.argv[2]
 
 # Calculate the circle equation based on three points
 def circleRadius(b, c, d):
@@ -63,11 +56,48 @@ def clickCrop(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONUP:
         coordList.append(coord)
 
+
 #MAIN
+
+if len(sys.argv) <= 1:
+    print("Axlecutter script.\n")
+    print("Cuts circles on frames based on three different mouse clicks. Images already processed are moved to another folder. All file paths must be edited on code, for now.\n")
+    print("Usage:\n")
+    print("python cutCircles.py <image/video> <source_folder>\n")
+    exit(1)
 
 decision = sys.argv[1]
 coordList = []
 axleCount = 0
+
+# Output folder to store images that were already cut, derived from img_src
+img_done = img_src[:img_src.rfind("\\")+1]+"Done\\"
+try:
+    os.mkdir(img_done)
+except OSError as e:
+    if e.errno == errno.EEXIST:
+        print("Info: Folder " + str(img_done) + " already exists.")
+        pass
+    elif e.errno == errno.EACCES:
+        print("Error: Folder "+ str(img_done) + " could not be created. Check permissions.")
+        exit(1)
+    else:
+        print("Error: "+ str(e))
+        exit(1)
+
+# Output folder to store cut circles, also derived from img_src
+img_circles = img_src[:img_src.rfind("\\")+1]+"Circle\\"
+try:
+    os.mkdir(img_circles)
+except OSError as e:
+    if e.errno == errno.EEXIST:
+        print("Info: Folder " + str(img_circles) + " already exists.")
+        pass
+    elif e.errno == errno.EACCES:
+        print("Error: Folder "+ str(img_circles) + " could not be created. Check permissions.")
+    else:
+        print("Error: "+ str(e))
+
 
 if (decision == "video"):
     cap = cv2.VideoCapture(0)
@@ -191,30 +221,25 @@ elif (decision == "image"):
                 #cropped_axle = frame[center[0]-radius:center[1]-radius), center[0]+radius:center[1]+radius/2]    
                 cv2.rectangle(frame, (center[0]-radius, center[1]-radius), (center[0]+radius,center[1]+radius), (0, 255, 0), 2)
                 cv2.imshow('frame', frame)    
-
-                fname = f[f.rfind("\\")+1:-4]           
-                
+         
                 #crops image on original frame
                 croppedAxle = frameCrop[center[1]-radius:center[1]+radius, center[0]-radius:center[0]+radius]  
                 cv2.imshow('crop', croppedAxle)
-
-                cv2.imwrite(out+fname+"_axle_"+str(axleCount)+".jpg",croppedAxle)
+                
+                fname = f[f.rfind("\\")+1:-4]
+                cv2.imwrite(img_circles+fname+"_axle_"+str(axleCount)+".jpg",croppedAxle)
                 axleCount += 1
 
             k = 0xFF & cv2.waitKey(1)            
             if k == 32: #SPACE
                 cropping = not cropping
 
-                if not os.path.exists(img_dest):
-                    print("Directory", img_dest, " does not exist. Creating it now...")
-                    os.mkdir(img_dest)
-
                 fname = f[f.rfind("\\")+1:]
 
-                with open(img_dest+"cut.dat","a") as log:
+                with open(img_done+"cut.dat","a") as log:
                     log.write(str(fname)+" "+str(axleCount)+"\n")
 
-                os.rename(f,img_dest+fname)
+                os.rename(f,img_done+fname)
                 axleCount = 0
 
             if k == 27: #ESC
