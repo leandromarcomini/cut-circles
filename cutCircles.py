@@ -17,7 +17,7 @@ if len(sys.argv) <= 1:
     print("Axlecutter script.\n")
     print("Cuts circles on frames based on three different mouse clicks. Images already processed are moved to another folder. All file paths must be edited on code, for now.\n")
     print("Usage:\n")
-    print("python cutCircles.py <image/video>\n")
+    print("python cutCircles.py <image/video>\n\n")
     exit(1)
 
 # Paths
