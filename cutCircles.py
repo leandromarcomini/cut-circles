@@ -5,6 +5,14 @@ Cuts circles on frames based on three different mouse clicks. Images already pro
 Usage:
     python cutCircles.py <image/video> <source_folder>
 
+Manual:
+    When started on a folder with several images, the program will open the first one and wait for the circles to be selected.
+For each group of three points clicked on the image, the program will try to find the center of the circle and it's radius.
+After that, it will cut the image, show the result, and will wait for more cuts to be made. You can select as many circles 
+as you wish on each image.
+
+    To go to the next image, press "SPACE"
+    To exit the program, press "ESC"
 """
 import cv2
 import numpy as np
@@ -12,6 +20,20 @@ import sys
 import errno
 import os
 import glob as gl
+
+if len(sys.argv) != 3:
+    print("-----------------------")
+    print("| Cut Circles script. |")
+    print("-----------------------")
+    print("\nCuts circles on frames based on three different mouse clicks. Images already processed are moved to 'Done' folder. Circles are stored on 'Circles' folder.\n")
+    print("Usage:\n")
+    print("  python cutCircles.py <image/video> <source_folder>\n")
+    print("Example:\n")
+    print("  python cutCircles.py image \"c:\Data\Images\"\n")
+    print("Instructions:\n")
+    print("  Press 'SPACE' to go to the next image.")
+    print("  Press 'ESC' to exit the application.")
+    exit(1)
 
 # Paths
 # video_src = "D:\\Videos\\Truck\\Lateral\\Balanca\\20160927100754-550.MP4"
@@ -58,13 +80,6 @@ def clickCrop(event, x, y, flags, param):
 
 
 #MAIN
-
-if len(sys.argv) <= 1:
-    print("Axlecutter script.\n")
-    print("Cuts circles on frames based on three different mouse clicks. Images already processed are moved to another folder. All file paths must be edited on code, for now.\n")
-    print("Usage:\n")
-    print("python cutCircles.py <image/video> <source_folder>\n")
-    exit(1)
 
 decision = sys.argv[1]
 coordList = []
